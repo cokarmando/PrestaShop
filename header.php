@@ -34,3 +34,6 @@ else
 }
 Tools::displayFileAsDeprecated();
 $controller->displayHeader();
+
+
+/* This is an example */
