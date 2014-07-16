@@ -24,6 +24,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+/* Edit Sample Local (I'm Armando Salvador, we are in training ;) Thnx! */
+
 require_once(dirname(__FILE__).'/config/config.inc.php');
 Tools::displayFileAsDeprecated();
 Controller::getController('PageNotFoundController')->run();
