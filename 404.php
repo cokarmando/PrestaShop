@@ -27,6 +27,3 @@
 require_once(dirname(__FILE__).'/config/config.inc.php');
 Tools::displayFileAsDeprecated();
 Controller::getController('PageNotFoundController')->run();
-
-
-// My New Comment //
