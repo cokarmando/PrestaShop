@@ -27,5 +27,3 @@
 require_once(dirname(__FILE__).'/config/config.inc.php');
 Tools::displayFileAsDeprecated();
 Controller::getController('PageNotFoundController')->run();
-
-/* Adding a new comment in 4040.php (Im in training) */
