@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -67,7 +67,7 @@
 					<br />
 					<li>
 						{l s='The Simple mode uses the MySQL "LIKE" pattern matching, but for a higher potency you can use MySQL\'s regular expressions in the Expert mode.'}
-						<a class="btn btn-link" href="http://dev.mysql.com/doc/refman/5.0/en/regexp.html" target="_blank" style="font-style: italic;"><i class="icon-external-link-sign"></i> {l s='Take a look at MySQL\'s documentation for more details.'}</a>
+						<a class="btn btn-link _blank" href="http://dev.mysql.com/doc/refman/5.0/en/regexp.html" style="font-style: italic;"><i class="icon-external-link-sign"></i> {l s='Take a look at MySQL\'s documentation for more details.'}</a>
 					</li>
 				</ul>
 			</div>
@@ -83,7 +83,6 @@
 	{/if}
 {/block}
 
-
 {block name="fieldset"}
 	{if $f == 3}
 		<div id="tracking_expert" style="display: none;">
@@ -91,16 +90,16 @@
 		</div>
 	{else}
 		{$smarty.block.parent}
-	{/if}	
+	{/if}
 {/block}
 
 {block name="label"}
 	{if isset($input.legend)}
-		<legend>{$input.legend}</legend>		
+		<legend>{$input.legend}</legend>
 	{/if}
 
 	{if isset($input.label)}
-		<label class="control-label col-lg-3" for="{$input.name}">{$input.label}</label>
+		<label class="control-label col-lg-3" for="{if isset($input.id) && $input.id}{$input.id|escape:'html':'UTF-8'}{elseif isset($input.name) && $input.name}{$input.name|escape:'html':'UTF-8'}{/if}">{$input.label}</label>
 	{/if}
 {/block}
 

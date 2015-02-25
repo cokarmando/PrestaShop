@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,13 +18,13 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <div class="row">
 	<div class="col-lg-6">
-			<form action="{$current}&amp;token={$token}" method="post" id="refresh_index_form" name="refresh_index_form" class="form-horizontal">
+			<form action="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}" method="post" id="refresh_index_form" name="refresh_index_form" class="form-horizontal">
 				<div class="panel">
 					<h3>
 						<i class="icon-fullscreen"></i> {l s='Indexing'}
@@ -37,7 +37,7 @@
 			</form>
 		</div>
 		<div class="col-lg-6">
-			<form action="{$current}&amp;token={$token}" method="post" id="refresh_cache_form" name="refresh_cache_form" class="form-horizontal">
+			<form action="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}" method="post" id="refresh_cache_form" name="refresh_cache_form" class="form-horizontal">
 				<div class="panel">
 					<h3>
 						<i class="icon-briefcase"></i> {l s='Cache'}
@@ -54,7 +54,7 @@
 
 <div id="settings_referrers" class="row">
 	<div class="col-lg-3">
-		<form action="{$current}&amp;token={$token}" method="post" id="settings_form" name="settings_form" class="form-horizontal">
+		<form action="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}" method="post" id="settings_form" name="settings_form" class="form-horizontal">
 			<div class="panel">
 				<h3>
 					<i class="icon-cog"></i> {l s='Settings'}

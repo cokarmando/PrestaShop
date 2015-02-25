@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -93,7 +93,7 @@
 		<div id="required_column" class="alert alert-warning" style="display:none;">
 			{l s='This column must be set:'} <span id="missing_column">&nbsp;</span>
 		</div>
-		<form action="{$current}&amp;token={$token}" method="post" id="import_form" name="import_form" class="form-horizontal">
+		<form action="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}" method="post" id="import_form" name="import_form" class="form-horizontal">
 			<input type="hidden" name="csv" value="{$fields_value.csv}" />
 			<input type="hidden" name="convert" value="{$fields_value.convert}" />
 			<input type="hidden" name="regenerate" value="{$fields_value.regenerate}" />

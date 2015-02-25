@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -31,7 +31,7 @@
 		</button>
 		<ul class="dropdown-menu">
 			{foreach from=$module_languages item=language}
-			<li><a href="{$trad_link}{$language['iso_code']}#{$module_name}">{$language.name}</a></li>
+			<li><a href="{$trad_link|escape:'html':'UTF-8'}{$language['iso_code']|escape:'html':'UTF-8'}#{$module_name|escape:'html':'UTF-8'}">{$language.name|escape:'html':'UTF-8'}</a></li>
 			{/foreach}
 		</ul>
 	</div>

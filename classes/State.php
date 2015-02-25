@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -105,13 +105,13 @@ class StateCore extends ObjectModel
 	{
 		if (empty($state))
 			return false;
-		$cache_id = 'State::getNameById_'.pSQL($state);
+		$cache_id = 'State::getIdByName_'.pSQL($state);
 		if (!Cache::isStored($cache_id))
 		{
 			$result = (int)Db::getInstance()->getValue('
 				SELECT `id_state`
 				FROM `'._DB_PREFIX_.'state`
-				WHERE `name` LIKE \''.pSQL($state).'\'
+				WHERE `name` = \''.pSQL($state).'\'
 			');
 			Cache::store($cache_id, $result);
 		}

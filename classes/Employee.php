@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -65,7 +65,7 @@ class EmployeeCore extends ObjectModel
 
 	/** @var string employee's chosen theme */
 	public $bo_theme;
-	
+
 	/** @var string employee's chosen css file */
 	public $bo_css = 'admin-theme.css';
 
@@ -74,7 +74,7 @@ class EmployeeCore extends ObjectModel
 
 	/** @var bool, false */
 	public $bo_menu = 1;
-	
+
 	/* Deprecated */
 	public $bo_show_screencast = false;
 
@@ -211,7 +211,7 @@ class EmployeeCore extends ObjectModel
 				$this->bo_css = $bo_css;
 		}
 	}
-	
+
 	protected function saveOptin()
 	{
 		if ($this->optin && !defined('PS_INSTALLATION_IN_PROGRESS'))
@@ -230,13 +230,15 @@ class EmployeeCore extends ObjectModel
 
 	/**
 	 * Return list of employees
+	 * @param boolean $active_only Filter employee by active status
+	 * @return Employees array or false
 	 */
-	public static function getEmployees()
+	public static function getEmployees($active_only = true)
 	{
 		return Db::getInstance()->executeS('
 			SELECT `id_employee`, `firstname`, `lastname`
 			FROM `'._DB_PREFIX_.'employee`
-			WHERE `active` = 1
+			'.($active_only ? ' WHERE `active` = 1' : '').'
 			ORDER BY `lastname` ASC
 		');
 	}
@@ -246,9 +248,10 @@ class EmployeeCore extends ObjectModel
 	  *
 	  * @param string $email e-mail
 	  * @param string $passwd Password is also checked if specified
+	  * @param boolean $active_only Filter employee by active status
 	  * @return Employee instance
 	  */
-	public function getByEmail($email, $passwd = null)
+	public function getByEmail($email, $passwd = null, $active_only = true)
 	{
 	 	if (!Validate::isEmail($email) || ($passwd != null && !Validate::isPasswd($passwd)))
 	 		die(Tools::displayError());
@@ -256,9 +259,9 @@ class EmployeeCore extends ObjectModel
 		$result = Db::getInstance()->getRow('
 		SELECT *
 		FROM `'._DB_PREFIX_.'employee`
-		WHERE `active` = 1
-		AND `email` = \''.pSQL($email).'\'
-		'.($passwd !== null ? 'AND `passwd` = \''.Tools::encrypt($passwd).'\'' : ''));
+		WHERE `email` = \''.pSQL($email).'\'
+		'.($active_only ? ' AND active = 1' : '')
+		.($passwd !== null ? ' AND `passwd` = \''.Tools::encrypt($passwd).'\'' : ''));
 		if (!$result)
 			return false;
 		$this->id = $result['id_employee'];
@@ -359,6 +362,15 @@ class EmployeeCore extends ObjectModel
 		$this->id = null;
 	}
 
+	public function favoriteModulesList()
+	{
+		return Db::getInstance()->executeS('
+			SELECT module
+			FROM `'._DB_PREFIX_.'module_preference`
+			WHERE `id_employee` = '.(int)$this->id.' AND `favorite` = 1 AND (`interest` = 1 OR `interest` IS NULL)'
+		);
+	}
+
 	/**
 	 * Check if the employee is associated to a specific shop
 	 *
@@ -420,7 +432,7 @@ class EmployeeCore extends ObjectModel
 	{
 		return $this->id_profile == _PS_ADMIN_PROFILE_;
 	}
-	
+
 	public function getImage()
 	{
 		if (!Validate::isLoadedObject($this))
@@ -440,5 +452,14 @@ class EmployeeCore extends ObjectModel
 			$max = 0;
 
 		return (int)$max;
+	}
+
+	public static function setLastConnectionDate($id_employee)
+	{
+		return  Db::getInstance()->execute('
+			UPDATE `'._DB_PREFIX_.'employee`
+			SET `last_connection_date` = CURRENT_DATE()
+			WHERE `id_employee` = '.(int)$id_employee.' AND `last_connection_date`< CURRENT_DATE()
+		');
 	}
 }

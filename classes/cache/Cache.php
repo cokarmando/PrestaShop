@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -197,7 +197,7 @@ abstract class CacheCore
 		$keys = array();
 		if ($key == '*')
 			$keys = $this->keys;
-		else if (strpos($key, '*') === false)
+		elseif (strpos($key, '*') === false)
 			$keys = array($key);
 		else
 		{
@@ -232,6 +232,9 @@ abstract class CacheCore
 		if ($this->isBlacklist($query))
 			return true;
 
+		if (empty($result))
+			$result = array();
+
 		if (is_null($this->sql_tables_cached))
 		{
 			$this->sql_tables_cached = $this->get(Tools::encryptIV(self::SQL_TABLES_NAME));
@@ -239,10 +242,10 @@ abstract class CacheCore
 				$this->sql_tables_cached = array();
 		}
 
-		// Store query results in cache if this query is not already cached
+		// Store query results in cache
 		$key = Tools::encryptIV($query);
-		if ($this->exists($key))
-			return true;
+		// no need to check the key existence before the set : if the query is already
+		// in the cache, setQuery is not invoked
 		$this->set($key, $result);
 
 		// Get all table from the query and save them in cache
@@ -303,7 +306,7 @@ abstract class CacheCore
 	protected function isBlacklist($query)
 	{
 		foreach ($this->blacklist as $find)
-			if (strpos($query, '`'._DB_PREFIX_.$find.'`') || strpos($query, ' '._DB_PREFIX_.$find.' '))
+			if (false !== strpos($query, _DB_PREFIX_.$find))
 				return true;
 		return false;
 	}

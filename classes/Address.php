@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -171,10 +171,10 @@ class AddressCore extends ObjectModel
 			return false;
 
 		if (Validate::isUnsignedId($this->id_customer))
-			Customer::resetAddressCache($this->id_customer);
+			Customer::resetAddressCache($this->id_customer, $this->id);
 		return true;
 	}
-	
+
 	public function update($null_values = false)
 	{
 		// Empty related caches
@@ -184,7 +184,7 @@ class AddressCore extends ObjectModel
 			unset(self::$_idZones[$this->id]);
 
 		if (Validate::isUnsignedId($this->id_customer))
-			Customer::resetAddressCache($this->id_customer);
+			Customer::resetAddressCache($this->id_customer, $this->id);
 
 		return parent::update($null_values);
 	}
@@ -195,7 +195,7 @@ class AddressCore extends ObjectModel
 	public function delete()
 	{
 		if (Validate::isUnsignedId($this->id_customer))
-			Customer::resetAddressCache($this->id_customer);
+			Customer::resetAddressCache($this->id_customer, $this->id);
 
 		if (!$this->isUsed())
 			return parent::delete();
@@ -242,15 +242,24 @@ class AddressCore extends ObjectModel
 	{
 		if(!isset($id_address) || empty($id_address))
 			return false;
+
 		if (isset(self::$_idZones[$id_address]))
 			return self::$_idZones[$id_address];
 
+		$id_zone = Hook::exec('actionGetZoneById', array('id_address' => $id_address));
+
+		if (is_numeric($id_zone))
+		{
+			self::$_idZones[$id_address] = (int)$id_zone;
+			return self::$_idZones[$id_address];
+		}
+
 		$result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
-		SELECT s.`id_zone` AS id_zone_state, c.`id_zone`
-		FROM `'._DB_PREFIX_.'address` a
-		LEFT JOIN `'._DB_PREFIX_.'country` c ON c.`id_country` = a.`id_country`
-		LEFT JOIN `'._DB_PREFIX_.'state` s ON s.`id_state` = a.`id_state`
-		WHERE a.`id_address` = '.(int)$id_address);
+			SELECT s.`id_zone` AS id_zone_state, c.`id_zone`
+			FROM `'._DB_PREFIX_.'address` a
+			LEFT JOIN `'._DB_PREFIX_.'country` c ON c.`id_country` = a.`id_country`
+			LEFT JOIN `'._DB_PREFIX_.'state` s ON s.`id_state` = a.`id_state`
+			WHERE a.`id_address` = '.(int)$id_address);
 
 		self::$_idZones[$id_address] = (int)((int)$result['id_zone_state'] ? $result['id_zone_state'] : $result['id_zone']);
 		return self::$_idZones[$id_address];
@@ -351,7 +360,7 @@ class AddressCore extends ObjectModel
 	* @param int $id_address
 	* @return Address address
 	*/
-	public static function initialize($id_address = null)
+	public static function initialize($id_address = null, $with_geoloc = false)
 	{
 		// if an id_address has been specified retrieve the address
 		if ($id_address)
@@ -359,7 +368,14 @@ class AddressCore extends ObjectModel
 			$address = new Address((int)$id_address);
 
 			if (!Validate::isLoadedObject($address))
-				throw new PrestaShopException('Invalid address');
+				throw new PrestaShopException('Invalid address #'.(int)$id_address);
+		}
+		elseif ($with_geoloc && isset($context->customer->geoloc_id_country))
+		{
+			$address = new Address();
+			$address->id_country = (int)$context->customer->geoloc_id_country;
+			$address->id_state = (int)$context->customer->id_state;
+			$address->postcode = $context->customer->postcode;
 		}
 		else
 		{
@@ -391,7 +407,7 @@ class AddressCore extends ObjectModel
 		$query->where('id_warehouse = 0');
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query);
 	}
-	
+
 	public static function aliasExist($alias, $id_address, $id_customer)
 	{
 		$query = new DbQuery();
@@ -403,5 +419,13 @@ class AddressCore extends ObjectModel
 		$query->where('deleted = 0');
 
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query);
+	}
+
+	public function getFieldsRequiredDB()
+	{
+		$this->cacheFieldsRequiredDatabase(false);
+		if (isset(self::$fieldsRequiredDatabase['Address']))
+			return self::$fieldsRequiredDatabase['Address'];
+		return array();
 	}
 }

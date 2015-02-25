@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -38,9 +38,9 @@
 				{assign var=params_url value="&id_category={$category.id_category|intval}&viewcategory"}
 			{/if}
 			{if isset($category.id_category) && $category.id_category == $categories_tree_current_id}
-				{$category.name}
+				{$category.name|escape:'html':'UTF-8'}
 			{else}
-				<a href="{$currentIndex}{$params_url}&amp;token={$token}">{$category.name}</a>
+				<a href="{$current|escape:'html':'UTF-8'}{$params_url|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}">{$category.name|escape:'html':'UTF-8'}</a>
 			{/if}
 		</li>
 		{/foreach}

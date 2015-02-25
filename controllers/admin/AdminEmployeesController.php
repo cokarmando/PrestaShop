@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,14 +19,14 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
 class AdminEmployeesControllerCore extends AdminController
 {
- 	/** @var array profiles list */
+	/** @var array profiles list */
 	protected $profiles_array = array();
 
 	/** @var array themes list*/
@@ -34,20 +34,20 @@ class AdminEmployeesControllerCore extends AdminController
 
 	/** @var array tabs list*/
 	protected $tabs_list = array();
-	
+
 	protected $restrict_edition = false;
 
 	public function __construct()
 	{
 		$this->bootstrap = true;
-	 	$this->table = 'employee';
+		$this->table = 'employee';
 		$this->className = 'Employee';
-	 	$this->lang = false;
+		$this->lang = false;
+		$this->context = Context::getContext();
 
 		$this->addRowAction('edit');
 		$this->addRowAction('delete');
-
-		$this->context = Context::getContext();
+		$this->addRowActionSkipList('delete', array((int)$this->context->employee->id));
 
 		$this->bulk_actions = array(
 			'delete' => array(
@@ -79,12 +79,12 @@ class AdminEmployeesControllerCore extends AdminController
 
 		$this->fields_list = array(
 			'id_employee' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
-			'lastname' => array('title' => $this->l('Last Name')),
 			'firstname' => array('title' => $this->l('First Name')),
+			'lastname' => array('title' => $this->l('Last Name')),
 			'email' => array('title' => $this->l('Email address')),
 			'profile' => array('title' => $this->l('Profile'), 'type' => 'select', 'list' => $this->profiles_array,
 				'filter_key' => 'pl!name', 'class' => 'fixed-width-lg'),
-			'active' => array('title' => $this->l('Can log in'), 'align' => 'center', 'active' => 'status',
+			'active' => array('title' => $this->l('Active'), 'align' => 'center', 'active' => 'status',
 				'type' => 'bool', 'class' => 'fixed-width-sm'),
 		);
 
@@ -125,7 +125,7 @@ class AdminEmployeesControllerCore extends AdminController
 					foreach (scandir($path.$theme.DIRECTORY_SEPARATOR.'css'.DIRECTORY_SEPARATOR.'schemes'.$rtl) as $css)
 						if ($css[0] != '.' && preg_match('/\.css$/', $css))
 						{
-							$name = (strpos($css,'admin-theme-') !== false ? Tools::ucfirst(preg_replace('/^admin-theme-(.*)\.css$/', '$1', $css)) : $css);
+							$name = strpos($css, 'admin-theme-') !== false ? Tools::ucfirst(preg_replace('/^admin-theme-(.*)\.css$/', '$1', $css)) : $css;
 							$this->themes[] = array('id' => $theme.'|schemes'.$rtl.'/'.$css, 'name' => $name);
 						}
 			}
@@ -194,7 +194,7 @@ class AdminEmployeesControllerCore extends AdminController
 
 	public function renderList()
 	{
- 		$this->_select = 'pl.`name` AS profile';
+		$this->_select = 'pl.`name` AS profile';
 		$this->_join = 'LEFT JOIN `'._DB_PREFIX_.'profile` p ON a.`id_profile` = p.`id_profile`
 		LEFT JOIN `'._DB_PREFIX_.'profile_lang` pl ON (pl.`id_profile` = p.`id_profile` AND pl.`id_lang` = '
 			.(int)$this->context->language->id.')';
@@ -238,8 +238,8 @@ class AdminEmployeesControllerCore extends AdminController
 				array(
 					'type' => 'html',
 					'name' => 'employee_avatar',
-					'html_content' => '<div id="employee-thumbnail"><a href="http://www.prestashop.com/forums/index.php?app=core&module=usercp" target="_blank" style="background-image:url('.$obj->getImage().')"></a></div>
-					<div class="alert alert-info">'.sprintf($this->l('Your avatar in PrestaShop 1.6.x is your profile picture on %1$s. To change your avatar, log in to PrestaShop.com with your email %2$s and follow the on-screen instructions.'), '<a href="http://www.prestashop.com/forums/index.php?app=core&module=usercp" class="alert-link" target="_blank">PrestaShop.com</a>', $obj->email).'</div>',
+					'html_content' => '<div id="employee-thumbnail"><a href="http://www.prestashop.com/forums/index.php?app=core&amp;module=usercp" target="_blank" style="background-image:url('.$obj->getImage().')"></a></div>
+					<div class="alert alert-info">'.sprintf($this->l('Your avatar in PrestaShop 1.6.x is your profile picture on %1$s. To change your avatar, log in to PrestaShop.com with your email %2$s and follow the on-screen instructions.'), '<a href="http://www.prestashop.com/forums/index.php?app=core&amp;module=usercp" class="alert-link" target="_blank">PrestaShop.com</a>', $obj->email).'</div>',
 				),
 				array(
 					'type' => 'text',
@@ -254,23 +254,27 @@ class AdminEmployeesControllerCore extends AdminController
 		);
 
 		if ($this->restrict_edition)
+		{
 			$this->fields_form['input'][] = array(
 				'type' => 'change-password',
 				'label' => $this->l('Password'),
 				'name' => 'passwd'
 				);
+
+			if (Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController')))
+				$this->fields_form['input'][] = array(
+					'type' => 'prestashop_addons',
+					'label' => 'PrestaShop Addons',
+					'name' => 'prestashop_addons',
+				);
+		}
 		else
 			$this->fields_form['input'][] = array(
 				'type' => 'password',
 				'label' => $this->l('Password'),
-				'hint' => sprintf($this->l('Minimum of %s characters.'), Validate::ADMIN_PASSWORD_LENGTH),
+				'hint' => sprintf($this->l('Password should be at least %s characters long.'), Validate::ADMIN_PASSWORD_LENGTH),
 				'name' => 'passwd'
-				);	
-		$this->fields_form['input'][] = array(
-			'type' => 'prestashop_addons',
-			'label' => 'PrestaShop Addons',
-			'name' => 'prestashop_addons',
-		);
+				);
 
 		$this->fields_form['input'] = array_merge($this->fields_form['input'], array(
 			array(
@@ -321,7 +325,7 @@ class AdminEmployeesControllerCore extends AdminController
 					'name' => 'name'
 				),
 				'onchange' => 'var value_array = $(this).val().split("|"); $("link").first().attr("href", "themes/" + value_array[0] + "/css/" + value_array[1]);',
-				'hint' => $this->l('Back Office theme.')
+				'hint' => $this->l('Back-office theme.')
 			),
 			array(
 				'type' => 'radio',
@@ -348,7 +352,7 @@ class AdminEmployeesControllerCore extends AdminController
 		{
 			$this->fields_form['input'][] = array(
 				'type' => 'switch',
-				'label' => $this->l('Status'),
+				'label' => $this->l('Active'),
 				'name' => 'active',
 				'required' => false,
 				'is_bool' => true,
@@ -369,8 +373,8 @@ class AdminEmployeesControllerCore extends AdminController
 
 			// if employee is not SuperAdmin (id_profile = 1), don't make it possible to select the admin profile
 			if ($this->context->employee->id_profile != _PS_ADMIN_PROFILE_)
-				 foreach ($available_profiles as $i => $profile)
-				 	if ($available_profiles[$i]['id_profile'] == _PS_ADMIN_PROFILE_)
+				foreach ($available_profiles as $i => $profile)
+					if ($available_profiles[$i]['id_profile'] == _PS_ADMIN_PROFILE_)
 					{
 						unset($available_profiles[$i]);
 						break;
@@ -420,12 +424,16 @@ class AdminEmployeesControllerCore extends AdminController
 	{
 		if (!($obj = $this->loadObject(true)))
 			return false;
+
+		if (Tools::getValue('id_profile') == _PS_ADMIN_PROFILE_ && $this->context->employee->id_profile != _PS_ADMIN_PROFILE_)
+			$this->errors[] = Tools::displayError('The provided profile is invalid');
+
 		$email = $this->getFieldValue($obj, 'email');
 		if (Validate::isEmail($email) && Employee::employeeExists($email) && (!Tools::getValue('id_employee')
 			|| ($employee = new Employee((int)Tools::getValue('id_employee'))) && $employee->email != $email))
 			$this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$email;
 	}
-	
+
 	public function processDelete()
 	{
 		if (!$this->canModifyEmployee())
@@ -433,15 +441,28 @@ class AdminEmployeesControllerCore extends AdminController
 
 		return parent::processDelete();
 	}
-	
+
 	public function processStatus()
 	{
 		if (!$this->canModifyEmployee())
 			return false;
-			
+
 		parent::processStatus();
 	}
-	
+
+	protected function processBulkDelete()
+	{
+		if (is_array($this->boxes) && !empty($this->boxes))
+			foreach ($this->boxes as $id_employee)
+				if ((int)$this->context->employee->id == (int)$id_employee)
+				{
+					$this->restrict_edition = true;
+					return $this->canModifyEmployee();
+				}
+
+		return parent::processBulkDelete();
+	}
+
 	protected function canModifyEmployee()
 	{
 		if ($this->restrict_edition)
@@ -464,10 +485,10 @@ class AdminEmployeesControllerCore extends AdminController
 			$this->errors[] = Tools::displayError('You cannot delete this account because it manages warehouses. Check your warehouses first.');
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public function processSave()
 	{
 		$employee = new Employee((int)Tools::getValue('id_employee'));
@@ -475,15 +496,15 @@ class AdminEmployeesControllerCore extends AdminController
 		// If the employee is editing its own account
 		if ($this->restrict_edition)
 		{
-			$current_password = Tools::getValue('old_passwd');
+			$current_password = trim(Tools::getValue('old_passwd'));
 			if (Tools::getValue('passwd') && (empty($current_password) || !Validate::isPasswdAdmin($current_password) || !$employee->getByEmail($employee->email, $current_password)))
 				$this->errors[] = Tools::displayError('Your current password is invalid.');
 			elseif (Tools::getValue('passwd') && (!Tools::getValue('passwd2') || Tools::getValue('passwd') !== Tools::getValue('passwd2')))
-				$this->errors[] = Tools::displayError('The confirmation password doesn\'t match.');
+				$this->errors[] = Tools::displayError('The confirmation password does not match.');
 
 			$_POST['id_profile'] = $_GET['id_profile'] = $employee->id_profile;
 			$_POST['active'] = $_GET['active'] = $employee->active;
-			
+
 			// Unset set shops
 			foreach ($_POST as $postkey => $postvalue)
 				if (strstr($postkey, 'checkBoxShopAsso_'.$this->table) !== false)
@@ -507,10 +528,10 @@ class AdminEmployeesControllerCore extends AdminController
 		}
 		else
 		{
-			$_POST['id_last_order'] = $employee->getLastElementsForNotify('order');;
- 			$_POST['id_last_customer_message'] = $employee->getLastElementsForNotify('customer_message');
- 			$_POST['id_last_customer'] = $employee->getLastElementsForNotify('customer');
- 		}
+			$_POST['id_last_order'] = $employee->getLastElementsForNotify('order');
+			$_POST['id_last_customer_message'] = $employee->getLastElementsForNotify('customer_message');
+			$_POST['id_last_customer'] = $employee->getLastElementsForNotify('customer');
+		}
 
 		//if profile is super admin, manually fill checkBoxShopAsso_employee because in the form they are disabled.
 		if ($_POST['id_profile'] == _PS_ADMIN_PROFILE_)
@@ -572,7 +593,7 @@ class AdminEmployeesControllerCore extends AdminController
 		$employee = new Employee((int)Tools::getValue('id_employee'));
 
 		if (!Validate::isLoadedObject($employee) && !Validate::isPasswd(Tools::getvalue('passwd'), Validate::ADMIN_PASSWORD_LENGTH))
-			return !($this->errors[] = sprintf(Tools::displayError('You must specify a password with a minimum of %s characters.'),
+			return !($this->errors[] = sprintf(Tools::displayError('The password must be at least %s characters long.'),
 				Validate::ADMIN_PASSWORD_LENGTH));
 
 		return parent::validateRules($class_name);
@@ -620,7 +641,7 @@ class AdminEmployeesControllerCore extends AdminController
 
 		return $res;
 	}
-	
+
 	protected function ajaxProcessFormLanguage()
 	{
 		$this->context->cookie->employee_form_lang = (int)Tools::getValue('form_language_id');
@@ -628,7 +649,7 @@ class AdminEmployeesControllerCore extends AdminController
 			die ('Error while updating cookie.');
 		die ('Form language updated.');
 	}
-	
+
 	protected function ajaxProcessToggleMenu()
 	{
 		$this->context->cookie->collapse_menu = (int)Tools::getValue('collapse');

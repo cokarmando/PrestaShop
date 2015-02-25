@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -80,10 +80,10 @@ abstract class Db extends DbCore
 			$this->uniqQueries[$uniqSql]++;
 
 			// No cache for query
-			if ($this->disableCache)
+			if ($this->disableCache && !stripos($sql, 'SQL_NO_CACHE'))
 				$sql = preg_replace('/^\s*select\s+/i', 'SELECT SQL_NO_CACHE ', trim($sql));
 
-			// Get tables in quer
+			// Get tables in query
 			preg_match_all('/(from|join)\s+`?'._DB_PREFIX_.'([a-z0-9_-]+)/ui', $sql, $matches);
 			foreach ($matches[2] as $table)
 			{
@@ -92,10 +92,10 @@ abstract class Db extends DbCore
 				$this->tables[$table]++;
 			}
 
-			// Execute query
 			$start = microtime(true);
 		}
 
+		// Execute query
 		$result = parent::query($sql);
 
 		if (!$explain)

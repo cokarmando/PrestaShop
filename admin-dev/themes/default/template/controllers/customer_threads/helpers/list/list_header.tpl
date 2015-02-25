@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -50,7 +50,7 @@
 					{if $total_thread == 0}
 						<span class="message-mail">{l s='No new messages'}</span>
 					{else}
-						<a href="{$currentIndex}&amp;token={$token}&amp;id_customer_thread={$id_customer_thread}&amp;viewcustomer_thread" class="button">
+						<a href="{$currentIndex|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer_thread={$id_customer_thread}&amp;viewcustomer_thread" class="button">
 							{$total_thread} 
 							{if $total_thread > 1}{l s='New messages'}{else}{l s='New message'}{/if}
 						</a>

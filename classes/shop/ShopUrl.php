@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -51,6 +51,12 @@ class ShopUrlCore extends ObjectModel
 			'id_shop' => 		array('type' => self::TYPE_INT, 'required' => true),
 			'physical_uri' => 	array('type' => self::TYPE_STRING, 'size' => 64),
 			'virtual_uri' => 	array('type' => self::TYPE_STRING, 'size' => 64),
+		),
+	);
+
+	protected $webserviceParameters = array(
+		'fields' => array(
+			'id_shop' => array('xlink_resource' => 'shops'),
 		),
 	);
 
@@ -154,7 +160,7 @@ class ShopUrlCore extends ObjectModel
 			SELECT domain, domain_ssl
 			FROM '._DB_PREFIX_.'shop_url
 			WHERE main = 1
-			AND id_shop = '.($id_shop !== null ? (int)$id_shop : Context::getContext()->shop->id));
+			AND id_shop = '.($id_shop !== null ? (int)$id_shop : (int)Context::getContext()->shop->id));
 			self::$main_domain[(int)$id_shop] = $row['domain'];
 			self::$main_domain_ssl[(int)$id_shop] = $row['domain_ssl'];
 		}

@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -107,7 +107,7 @@
 			{foreach from=$cmslinks item=cmslink}
 				{if $cmslink.meta_title != ''}
 					<li class="item">
-						<a href="{$cmslink.link|addslashes|escape:'html':'UTF-8'}" title="{$cmslink.meta_title|escape:'html':'UTF-8'}">
+						<a href="{$cmslink.link|escape:'html':'UTF-8'}" title="{$cmslink.meta_title|escape:'html':'UTF-8'}">
 							{$cmslink.meta_title|escape:'html':'UTF-8'}
 						</a>
 					</li>
@@ -126,7 +126,7 @@
 	{if $display_poweredby}
 	<section class="bottom-footer col-xs-12">
 		<div>
-			&copy; 2014 {l s='[1]Ecommerce software by %s[/1]' mod='blockcms' sprintf=['PrestaShop™'] tags=['<a class="_blank" href="http://www.prestashop.com">']}
+			&copy; 2015 {l s='[1]Ecommerce software by %s[/1]' mod='blockcms' sprintf=['PrestaShop™'] tags=['<a class="_blank" href="http://www.prestashop.com">']}
 		</div>
 	</section>
 	{/if}
